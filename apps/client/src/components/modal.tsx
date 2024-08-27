@@ -7,13 +7,6 @@ import ReactModal from "react-modal"
 
 import { showModal } from "../store"
 
-console.log(1231313212312312313)
-console.log(1231313212312312313)
-console.log(1231313212312312313)
-console.log(1231313212312312313)
-console.log(1231313212312312313)
-console.log(1231313212312312313)
-console.log(1231313212312312313)
 const customStyles = {
   content: {
     top: "50%",
