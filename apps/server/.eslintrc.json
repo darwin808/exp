@@ -1,0 +1,131 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended",
+    "google",
+    "plugin:prettier/recommended",
+    "plugin:tailwindcss/recommended",
+    "plugin:import/errors",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:prefer-type-alias/recommended",
+    "prettier"
+  ],
+
+  "overrides": [
+    {
+      "files": ["./src/App.tsx"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ],
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "project": "./tsconfig.json",
+
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "react-hooks",
+    "@typescript-eslint",
+    "only-error",
+    "unused-imports",
+    "header",
+    "simple-import-sort",
+    "import",
+    "@tanstack/query",
+    "prefer-arrow",
+    "eslint-plugin-paths",
+    "check-file"
+  ],
+  "ignorePatterns": [
+    ".*.js",
+    "node_modules/",
+    "dist/",
+    ".eslintrc.json",
+    "vite.config.ts",
+    "postcss.config.js",
+    "jest.config.js",
+    "tailwind.config.js",
+    "setupTest.js"
+  ],
+
+  "settings": {},
+
+  "rules": {
+    "turbo/no-undeclared-env-vars": "off",
+    "require-jsdoc": "off",
+    "react/jsx-curly-brace-presence": ["error", { "props": "never", "children": "never" }],
+    "tailwindcss/no-custom-classname": 0,
+    "@typescript-eslint/prefer-includes": "error",
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
+    "@typescript-eslint/prefer-optional-chain": "error",
+    "@typescript-eslint/promise-function-async": "error",
+    "import/no-cycle": "error",
+    "linebreak-style": ["error", "unix"],
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object"],
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
+    ],
+    "import/default": "off",
+    "import/no-named-as-default-member": "off",
+    "import/no-named-as-default": "off",
+    "react/react-in-jsx-scope": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "paths/alias": "error",
+    "prefer-arrow/prefer-arrow-functions": [
+      "error",
+      {
+        "disallowPrototype": true,
+        "singleReturnOnly": false,
+        "classPropertiesAllowed": false
+      }
+    ],
+    "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
+    "func-style": ["error", "expression", { "allowArrowFunctions": true }],
+    "import/no-default-export": "error",
+    "react/prop-types": "off",
+    "@tanstack/query/exhaustive-deps": "error",
+    "valid-jsdoc": "off",
+    "no-console": ["error", { "allow": ["error"] }],
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-duplicates": "error",
+    "header/header": [2, "block", ["*", " * Property of the Darwin Apolinario", " "]],
+    "@typescript-eslint/no-explicit-any": "error",
+    "no-undef": "error",
+    "no-unused-vars": "error",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "check-file/folder-naming-convention": [
+      "error",
+      {
+        "src/**/": "CAMEL_CASE"
+      }
+    ]
+  }
+}

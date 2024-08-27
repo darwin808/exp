@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  poc_host:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/apps/poc_host
+    command: pnpm start
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+  poc_login:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/apps/poc_login
+    command: pnpm start
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+  poc_dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/apps/poc_dashboard
+    command: pnpm start
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+  poc_example:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/apps/poc_example
+    command: pnpm start
+    ports:
+      - "6969:6969"
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+  poc_hygiene:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/apps/poc_hygiene
+    command: pnpm start
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+volumes:
+  node_modules:

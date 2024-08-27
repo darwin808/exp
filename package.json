@@ -1,0 +1,63 @@
+{
+  "name": "exp",
+  "private": true,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "turbo build",
+    "preview": "turbo preview",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "start": "pnpm build && turbo start",
+    "check-types": "turbo check-types",
+    "prepare": "husky install && npm run prepare:dev",
+    "prepare:dev": "chmod ug+x .husky/*",
+    "commit": "git add . && cz",
+    "serve": "pnpm build && pnpm --filter poc_* --parallel preview",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-all": "pnpm format && pnpm lint && pnpm check-types",
+    "clean": "rimraf {apps,packages}/**/{node_modules,dist,.next,.turbo} -g && rimraf node_modules",
+    "test": "pnpm --filter poc_* --parallel test:coverage",
+    "test-e2e": "pnpm exec playwright test",
+    "test-e2e-ui": "pnpm exec playwright test --ui",
+    "test-e2e-head": "pnpm exec playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.0",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "commitizen": "^4.3.0",
+    "husky": "9.1.4",
+    "lint-staged": "^15.2.9",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.0.14"
+  },
+  "packageManager": "pnpm@9.3.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "prettier": {
+    "endOfLine": "lf",
+    "printWidth": 100,
+    "tabWidth": 2,
+    "trailingComma": "none",
+    "semi": false,
+    "singleQuote": false,
+    "bracketSpacing": true,
+    "arrowParens": "always"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "prettier --write",
+      "eslint  --ext .js,.jsx,.ts,.tsx"
+    ],
+    "*.{md,json}": [
+      "prettier -w"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}

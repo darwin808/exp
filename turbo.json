@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": ["API_HOST", "API_VERSION"],
+
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist"],
+      "env": ["VITE_API_URL", "DB_PORT", "SERVER_PORT", "DB_DATABASE", "DB_USER", "DB_PASSWORD"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "format": {
+      "dependsOn": ["^format"]
+    },
+    "check-all": {
+      "dependsOn": ["^check-all"]
+    },
+    "test": {
+      "dependsOn": ["^test:coverage"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

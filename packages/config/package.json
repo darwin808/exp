@@ -1,0 +1,30 @@
+{
+  "name": "@repo/config",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --fix --max-warnings 0",
+    "generate:component": "turbo gen react-component"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@turbo/gen": "^1.11.3",
+    "@types/eslint": "^8.56.1",
+    "@types/node": "^20.10.6",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.17",
+    "dotenv": "^16.4.5",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {}
+}
