@@ -1,0 +1,23 @@
+CREATE TABLE user_data (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    date TIMESTAMP NOT NULL,
+    value VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE user_data
+ALTER COLUMN value TYPE NUMERIC(10, 2) USING value::NUMERIC;
+
+
+BEGIN;
+
+ALTER TABLE user_data
+ADD COLUMN description TEXT DEFAULT 'No description';
+
+COMMIT;
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL
+);
+

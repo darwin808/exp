@@ -1,10 +1,12 @@
 /**
  * Property of the Darwin Apolinario
  */
+import bcrypt from "bcryptjs"
 import cors from "cors"
 import dotenv from "dotenv"
 import express, { Request, Response } from "express"
 import { body, validationResult } from "express-validator"
+import jwt from "jsonwebtoken"
 import { Client } from "pg"
 
 // Initialize dotenv to load environment variables
@@ -32,7 +34,31 @@ client.connect()
 app.use(express.json())
 app.use(cors())
 
-app.get("/", async (_req: Request, res: Response) => {
+const authenticateToken = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  const authHeader = req.headers["authorization"]
+  const token = authHeader?.split(" ")[1]
+
+  if (!token) {
+    return res.status(401).json({ error: "Missing token" })
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid token" })
+    }
+    console.error(user)
+    next()
+    return
+  })
+
+  return
+}
+
+app.get("/", authenticateToken, async (_req: Request, res: Response) => {
   try {
     res.send({ darwin: "test1:" })
   } catch (err) {
@@ -150,6 +176,70 @@ app.delete("/api/:id", async (req: Request, res: Response) => {
     console.error("Error executing query", err.stack)
     res.status(500).json({ error: "Internal server error" })
 
+    return
+  }
+})
+
+// JWT secret key
+const JWT_SECRET = "your_jwt_secret"
+// Validation middleware
+const validateDataAuth = [
+  body("username").notEmpty().withMessage("Username is required"),
+  body("email").notEmpty().withMessage("Date must be in ISO 8601 format"),
+  body("password").notEmpty().withMessage("Value must be a number")
+]
+
+app.post("/register", validateDataAuth, async (req: Request, res: Response) => {
+  const { username, email, password } = req?.body || {}
+
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const result = await client.query(
+      "INSERT INTO exp_users (username, email, password) VALUES ($1, $2, $3) RETURNING id",
+      [username, email, hashedPassword]
+    )
+
+    res.status(201).json({ message: "User registered successfully", data: result.rows })
+    return
+  } catch (error) {
+    res.status(500).json({ error: "Registration failed", msg: error })
+    return
+  }
+})
+
+// Login route
+app.post("/login", async (req: Request, res: Response) => {
+  const { username, password } = req.body
+
+  try {
+    // Find user in database
+    const result = await client.query("SELECT * FROM exp_users WHERE username = $1", [username])
+    const user = result.rows[0]
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" })
+    }
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid credentials" })
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" })
+
+    res.json({ token })
+    return
+  } catch (error) {
+    res.status(500).json({ error: "Login failed", msg: error })
     return
   }
 })
