@@ -29,4 +29,5 @@ export type userData = {
   date: string
   value: string
   item_id?: number
+  description?: string
 }
