@@ -16,6 +16,7 @@ import { generateDays } from "./utils"
 
 const App = () => {
   const userData = useUserData()
+  const verify = useVerify()
 
   const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1)
   const [currentYear, setCurrentYear] = useState(dayjs().year())
@@ -56,7 +57,18 @@ const App = () => {
       <div className="font-Regular h-screen w-screen overflow-hidden bg-white">
         <HeaderComp {...headerCompProps} />
         <div className="flex flex-row">
-          <div className="h-full w-96"></div>
+          <div className="h-full w-96">
+            <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
+            <button
+              className="bg-red-400 rounded-full px-2 text-xs py-1"
+              onClick={() => {
+                window.localStorage.removeItem("token")
+                window.location.replace("/login")
+              }}
+            >
+              Log out
+            </button>
+          </div>
 
           <div className="flex size-full flex-col">
             <MonthRow days={daysOfTheMonth} start={0} end={7} headerColumn={true} />

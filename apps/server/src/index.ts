@@ -120,7 +120,7 @@ app.get("/api", authenticateToken, async (req: Request, res: Response) => {
 const validateData = [
   body("date").isISO8601().withMessage("Date must be in ISO 8601 format"),
   body("value").isNumeric().withMessage("Value must be a number"),
-  body("description").isNumeric().withMessage("description 404")
+  body("description").isString().notEmpty().withMessage("description 404")
 ]
 
 app.post("/api", validateData, authenticateToken, async (req: Request, res: Response) => {

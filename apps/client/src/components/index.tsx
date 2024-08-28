@@ -6,7 +6,7 @@ import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { Tooltip as ReactTooltip } from "react-tooltip"
 
-import { deleteData, login, postData, register, useVerify } from "../api"
+import { deleteData, login, postData, register } from "../api"
 import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
@@ -48,7 +48,7 @@ export const MonthRow = ({ days, start, end }: Props) => {
               }
             }}
             key={i}
-            className={`size-32 border border-black  ${isDateToday ? "bg-gray-300" : "bg-transparent"}`}
+            className={`hover:bg-gray-200 transition-all size-32 border-2 rounded-lg border-black  ${isDateToday ? "bg-gray-300" : "bg-transparent"}`}
           >
             <h1
               className="text-center text-2xl"
@@ -111,7 +111,6 @@ export const HeaderComp = ({
   setCurrentMonth,
   setCurrentYear
 }: headerCompProps) => {
-  const verify = useVerify()
   const userData = useAtomValue(userDataAtom)
   const totalMoney = sumValues(userData)
   const finalMoney = Number(totalMoney.toFixed(2)).toLocaleString()
@@ -153,17 +152,6 @@ export const HeaderComp = ({
             Next
           </button>
         </div>
-
-        <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
-        <button
-          className="bg-red-400 rounded-full px-2 text-xs py-1"
-          onClick={() => {
-            window.localStorage.removeItem("token")
-            window.location.replace("/login")
-          }}
-        >
-          Log out
-        </button>
       </div>
       <div className="flex  w-full justify-end  px-4">
         <div className="flex h-full w-64   items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/80">
