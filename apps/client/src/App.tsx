@@ -1,18 +1,20 @@
 /**
- * Property of the Darwin Apolinario
+ * Property of the Metropolitan Bank & Trust Co.
+ * Reuse as a whole or in part is prohibited without permission.
+ * Created by the Product Engineering team/Digital Banking Division
  */
 import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
+import { Outlet, Route, Routes } from "react-router-dom"
 
 import { useUserData, useVerify } from "./api"
 import { HeaderComp, Modal, ModalForm, MonthRow } from "./components"
+import { RegisterScreen } from "./screens"
+import { LoginScreen } from "./screens/loginScreen"
 import { modalDayData, userDataAtom } from "./store"
 import { DayInfo } from "./types"
 import { generateDays } from "./utils"
-import { Routes, Route, Outlet } from "react-router-dom"
-import { LoginScreen } from "./screens/loginScreen"
-import { RegisterScreen } from "./screens"
 
 const App = () => {
   const userData = useUserData()

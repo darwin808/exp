@@ -1,16 +1,18 @@
 /**
- * Property of the Darwin Apolinario
+ * Property of the Metropolitan Bank & Trust Co.
+ * Reuse as a whole or in part is prohibited without permission.
+ * Created by the Product Engineering team/Digital Banking Division
  */
 import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
+import { Tooltip as ReactTooltip } from "react-tooltip"
 
 import { deleteData, login, postData, register, useVerify } from "../api"
 import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
 import { sumValues } from "../utils"
-import { Tooltip as ReactTooltip } from "react-tooltip"
 
 export { Modal } from "./modal"
 

@@ -1,5 +1,7 @@
 /**
- * Property of the Darwin Apolinario
+ * Property of the Metropolitan Bank & Trust Co.
+ * Reuse as a whole or in part is prohibited without permission.
+ * Created by the Product Engineering team/Digital Banking Division
  */
 import axios from "axios"
 import useSWR, { mutate } from "swr"
@@ -77,7 +79,7 @@ export const postData = async (newData: userData) => {
   }
 }
 
-export const deleteData = async (id: number, username: string) => {
+export const deleteData = async (id: number) => {
   try {
     await axiosInstance.delete(`/api/${id}`)
 
