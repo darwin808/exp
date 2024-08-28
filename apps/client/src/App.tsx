@@ -48,10 +48,6 @@ const App = () => {
     }
   }, [userData?.data, setUserData])
 
-  if (userData.isLoading) {
-    return <div>loading</div>
-  }
-
   return (
     <>
       <Modal>
