@@ -188,13 +188,15 @@ export const ModalForm = ({ data }: { data: DayInfo | null }) => {
   }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true)
     e.preventDefault()
+    if (!loading && val && description) {
+      setLoading(true)
 
-    await postData(payload)
-    setVal("")
-    setShowModal(false)
-    setLoading(false)
+      await postData(payload)
+      setVal("")
+      setShowModal(false)
+      setLoading(false)
+    }
   }
 
   return (
