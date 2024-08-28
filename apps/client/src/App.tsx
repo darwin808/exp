@@ -10,7 +10,7 @@ import { HeaderComp, Modal, ModalForm, MonthRow } from "./components"
 import { modalDayData, userDataAtom } from "./store"
 import { DayInfo } from "./types"
 import { generateDays } from "./utils"
-import { Routes, Route, Link, Outlet } from "react-router-dom"
+import { Routes, Route, Outlet } from "react-router-dom"
 import { LoginScreen } from "./screens/loginScreen"
 import { RegisterScreen } from "./screens"
 
@@ -94,7 +94,7 @@ const AppRoutes = () => {
     </Routes>
   )
 
-  if (!verify.data) {
+  if (!verify.data ?? verify.isLoading) {
     authRoutes = (
       <Routes>
         <Route element={<Layout />}>
@@ -104,10 +104,6 @@ const AppRoutes = () => {
         </Route>
       </Routes>
     )
-  }
-
-  if (verify.isLoading) {
-    return <div>loading</div>
   }
 
   return authRoutes
