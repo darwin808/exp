@@ -26,13 +26,38 @@ export const useUserData = () => {
   }
 }
 
+export const useVerify = () => {
+  const { data, error, isLoading } = useSWR(`/verify`, fetcher)
+
+  return {
+    data,
+    isLoading,
+    isError: error
+  }
+}
 type LoginBody = {
   username: string
   password: string
 }
+
+type RegisterBody = {
+  username: string
+  password: string
+  email: string
+}
 export const login = async (body: LoginBody) => {
   try {
     const res = await axiosInstance.post("/login", {
+      ...body
+    })
+    return res.data
+  } catch (error) {
+    console.error("Error posting data:", error)
+  }
+}
+export const register = async (body: RegisterBody) => {
+  try {
+    const res = await axiosInstance.post("/register", {
       ...body
     })
     return res.data

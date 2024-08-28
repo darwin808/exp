@@ -5,7 +5,7 @@ import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 
-import { deleteData, login, postData } from "../api"
+import { deleteData, login, postData, register, useVerify } from "../api"
 import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
@@ -111,6 +111,7 @@ export const HeaderComp = ({
   setCurrentMonth,
   setCurrentYear
 }: headerCompProps) => {
+  const verify = useVerify()
   const userData = useAtomValue(userDataAtom)
   const totalMoney = sumValues(userData)
   const finalMoney = Number(totalMoney.toFixed(2)).toLocaleString()
@@ -152,9 +153,20 @@ export const HeaderComp = ({
             Next
           </button>
         </div>
+
+        <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
+        <button
+          className="bg-red-400 rounded-full px-2 text-xs py-1"
+          onClick={() => {
+            window.localStorage.removeItem("token")
+            window.location.replace("/login")
+          }}
+        >
+          Log out
+        </button>
       </div>
-      <div className="flex  w-full justify-end">
-        <div className="flex h-full w-64  items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/80">
+      <div className="flex  w-full justify-end  px-4">
+        <div className="flex h-full w-64   items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/80">
           <h1>$ {finalMoney}</h1>
         </div>
       </div>
@@ -226,17 +238,65 @@ export const ModalLoginForm = () => {
       window.localStorage.setItem("token", res.token)
 
       setShowModal(false)
+      window.location.replace("/")
     }
   }
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} className="flex flex-col">
       <input
         placeholder="Username"
         type="text"
         value={username}
         onChange={(e) => {
           setUsername(e.currentTarget.value)
+        }}
+      />
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={(e) => {
+          setPassword(e.currentTarget.value)
+        }}
+      />
+      <button type="submit">submit</button>
+    </form>
+  )
+}
+
+export const SignupForm = () => {
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const res = await register({ username, password, email })
+    if (res.token) {
+      window.localStorage.setItem("token", res.token)
+
+      window.location.replace("/")
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col">
+      <input
+        placeholder="Username"
+        type="text"
+        value={username}
+        onChange={(e) => {
+          setUsername(e.currentTarget.value)
+        }}
+      />
+      <input
+        placeholder="email"
+        type="text"
+        value={email}
+        onChange={(e) => {
+          setEmail(e.currentTarget.value)
         }}
       />
       <input

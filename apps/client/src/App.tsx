@@ -5,15 +5,17 @@ import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
 
-import { useUserData } from "./api"
-import { HeaderComp, Modal, ModalForm, ModalLoginForm, MonthRow } from "./components"
-import { modalDayData, showModal, userDataAtom } from "./store"
+import { useUserData, useVerify } from "./api"
+import { HeaderComp, Modal, ModalForm, MonthRow } from "./components"
+import { modalDayData, userDataAtom } from "./store"
 import { DayInfo } from "./types"
 import { generateDays } from "./utils"
+import { Routes, Route, Link, Outlet } from "react-router-dom"
+import { LoginScreen } from "./screens/loginScreen"
+import { RegisterScreen } from "./screens"
 
 const App = () => {
-  const token = window.localStorage.getItem("token")
-  const { data: userData, isLoading, isError } = useUserData("" ?? "")
+  const userData = useUserData()
 
   const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1)
   const [currentYear, setCurrentYear] = useState(dayjs().year())
@@ -21,7 +23,6 @@ const App = () => {
 
   const currentDay = dayjs().date()
   const modalData = useAtomValue(modalDayData)
-  const setShowModal = useSetAtom(showModal)
   const setUserData = useSetAtom(userDataAtom)
 
   const headerCompProps = {
@@ -37,42 +38,25 @@ const App = () => {
   }, [currentMonth, currentYear])
 
   useEffect(() => {
-    if (userData) {
-      const newRes = userData?.map((e) => {
+    if (userData.data) {
+      const newRes = userData?.data?.map((e) => {
         const date = dayjs(e.date).format("YYYY-MM-DD")
         return { ...e, date }
       })
 
       setUserData(newRes)
     }
-  }, [userData, setUserData])
+  }, [userData?.data, setUserData])
 
-  useEffect(() => {
-    if (!token) {
-      setShowModal(true)
-    }
-  }, [token, setShowModal])
-
-  if (isLoading) {
+  if (userData.isLoading) {
     return <div>loading</div>
   }
 
-  // if (isError) {
-  //   return <div>ERROR</div>
-  // }
-
   return (
     <>
-      {!token ? (
-        <Modal>
-          <ModalLoginForm />
-        </Modal>
-      ) : (
-        <Modal>
-          <ModalForm data={modalData} />
-        </Modal>
-      )}
-
+      <Modal>
+        <ModalForm data={modalData} />
+      </Modal>
       <div className="font-Regular h-screen w-screen overflow-hidden bg-white">
         <HeaderComp {...headerCompProps} />
         <div className="flex flex-row">
@@ -91,4 +75,41 @@ const App = () => {
   )
 }
 
-export default App
+const Layout = () => {
+  return (
+    <div className="">
+      <Outlet />
+    </div>
+  )
+}
+
+const AppRoutes = () => {
+  const verify = useVerify()
+  let authRoutes = (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<App />} />
+        <Route path="*" element={<App />} />
+      </Route>
+    </Routes>
+  )
+
+  if (!verify.data) {
+    authRoutes = (
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/register" element={<RegisterScreen />} />
+          <Route path="*" element={<LoginScreen />} />
+        </Route>
+      </Routes>
+    )
+  }
+
+  if (verify.isLoading) {
+    return <div>loading</div>
+  }
+
+  return authRoutes
+}
+export default AppRoutes

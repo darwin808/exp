@@ -59,6 +59,22 @@ const authenticateToken = (
   return
 }
 
+// verify endpoint
+app.get("/verify", authenticateToken, async (req, res) => {
+  try {
+    const query = `SELECT id, email, username from exp_users WHERE id = $1`
+
+    // @ts-expect-error: We assume `req.user` exists after authentication
+    const user = req.user
+
+    const result = await client.query(query, [user.userId])
+
+    res.status(200).json({ message: "Token is valid", user: result.rows[0], login: true })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
 app.get("/", authenticateToken, async (req: Request, res: Response) => {
   try {
     // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
@@ -180,11 +196,13 @@ app.post("/register", validateDataAuth, async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const result = await client.query(
-      "INSERT INTO exp_users (username, email, password) VALUES ($1, $2, $3) RETURNING id",
+      "INSERT INTO exp_users (username, email, password) VALUES ($1, $2, $3) RETURNING id, email, username",
       [username, email, hashedPassword]
     )
 
-    res.status(201).json({ message: "User registered successfully", data: result.rows })
+    // Generate JWT token
+    const token = jwt.sign({ userId: result.rows[0].id }, JWT_SECRET, { expiresIn: "1h" })
+    res.status(201).json({ message: "User registered successfully", data: result.rows[0], token })
     return
   } catch (error) {
     res.status(500).json({ error: "Registration failed", msg: error })

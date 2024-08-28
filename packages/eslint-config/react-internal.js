@@ -18,11 +18,13 @@ module.exports = {
   plugins: ["only-error", "unused-imports", "header", "simple-import-sort", "import"],
   globals: {
     React: true,
-    JSX: true
+    JSX: true,
+    document: true,
+    foo: true,
+    window: true
   },
   env: {
     browser: true,
-
     node: true
   },
   settings: {
