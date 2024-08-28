@@ -62,17 +62,7 @@ module.exports = {
     "import/first": "error",
     "import/newline-after-import": "error",
     "import/no-duplicates": "error",
-    "header/header": [
-      2,
-      "block",
-      [
-        "*",
-        " * Property of the Metropolitan Bank & Trust Co.",
-        " * Reuse as a whole or in part is prohibited without permission.",
-        " * Created by the Product Engineering team/Digital Banking Division",
-        " "
-      ]
-    ],
+    "header/header": [2, "block", ["*", " * Property of Darwin Apolinario", " "]],
     "@typescript-eslint/no-explicit-any": "error",
     "no-undef": "error",
     "no-unused-vars": "error",
