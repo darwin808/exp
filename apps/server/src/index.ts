@@ -142,9 +142,9 @@ app.post("/api", validateData, authenticateToken, async (req: Request, res: Resp
       VALUES ($1, $2, $3, $4)
     `
 
-    await client.query(query, [userId, date, value, description])
+    const result = await client.query(query, [userId, date, value, description])
 
-    res.status(201).json({ message: "Data added successfully" })
+    res.status(201).json({ message: "Data added successfully", data: result.rows })
 
     return
   } catch (err) {
