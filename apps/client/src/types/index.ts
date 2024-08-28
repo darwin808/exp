@@ -25,7 +25,7 @@ export type DaysOfMonth = {
 }
 
 export type userData = {
-  username: string
+  username?: string
   date: string
   value: string
   item_id?: number

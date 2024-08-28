@@ -6,15 +6,14 @@ import { useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
 
 import { useUserData } from "./api"
-import { HeaderComp, Modal, ModalForm, ModalUserForm, MonthRow } from "./components"
-import { modalDayData, showModal, userDataAtom, userNameAtom } from "./store"
+import { HeaderComp, Modal, ModalForm, ModalLoginForm, MonthRow } from "./components"
+import { modalDayData, showModal, userDataAtom } from "./store"
 import { DayInfo } from "./types"
 import { generateDays } from "./utils"
 
 const App = () => {
-  const setUserName = useSetAtom(userNameAtom)
-  const username = window.localStorage.getItem("username")
-  const { data: userData, isLoading, isError } = useUserData(username ?? "")
+  const token = window.localStorage.getItem("token")
+  const { data: userData, isLoading, isError } = useUserData("" ?? "")
 
   const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1)
   const [currentYear, setCurrentYear] = useState(dayjs().year())
@@ -49,14 +48,10 @@ const App = () => {
   }, [userData, setUserData])
 
   useEffect(() => {
-    setUserName(username)
-  }, [username, setUserName])
-
-  useEffect(() => {
-    if (!username) {
+    if (!token) {
       setShowModal(true)
     }
-  }, [username, setShowModal])
+  }, [token, setShowModal])
 
   if (isLoading) {
     return <div>loading</div>
@@ -68,9 +63,9 @@ const App = () => {
 
   return (
     <>
-      {!username ? (
+      {!token ? (
         <Modal>
-          <ModalUserForm />
+          <ModalLoginForm />
         </Modal>
       ) : (
         <Modal>

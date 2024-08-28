@@ -50,7 +50,8 @@ const authenticateToken = (
     if (err) {
       return res.status(403).json({ error: "Invalid token" })
     }
-    console.error(user)
+    // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
+    req.user = user
     next()
     return
   })
@@ -58,41 +59,37 @@ const authenticateToken = (
   return
 }
 
-app.get("/", authenticateToken, async (_req: Request, res: Response) => {
+app.get("/", authenticateToken, async (req: Request, res: Response) => {
   try {
-    res.send({ darwin: "test1:" })
+    // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
+    res.send({ darwin: req.user.userId })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "Internal server error" })
   }
 })
 
-app.get("/api", async (req: Request, res: Response) => {
+app.get("/api", authenticateToken, async (req: Request, res: Response) => {
   try {
-    const { username } = req.query
-
-    if (!username || typeof username !== "string") {
-      return res.status(400).json({ error: "Username is required" })
-    }
-
     const query = `
-      SELECT 
-        ud.id AS item_id,
-        u.username, 
-        ud.date, 
-        TO_CHAR(ud.value, 'FM999999999.00') AS value,
-        ud.description
-      FROM 
-        users u
-      JOIN 
-        user_data ud 
-      ON 
-        u.id = ud.user_id
-      WHERE 
-        u.username = $1;
-    `
-
-    const result = await client.query(query, [username])
+  SELECT 
+    ud.id AS item_id,
+    u.id AS user_id,
+    u.username, 
+    ud.date, 
+    TO_CHAR(ud.value, 'FM999999999.00') AS value,
+    ud.description
+  FROM 
+    exp_users u
+  JOIN 
+    user_data ud 
+  ON 
+    u.id = ud.user_id
+  WHERE 
+    u.id = $1
+`
+    // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
+    const result = await client.query(query, [req.user.userId])
 
     res.json(result.rows)
     return
@@ -105,12 +102,12 @@ app.get("/api", async (req: Request, res: Response) => {
 
 // Validation middleware
 const validateData = [
-  body("username").notEmpty().withMessage("Username is required"),
   body("date").isISO8601().withMessage("Date must be in ISO 8601 format"),
-  body("value").isNumeric().withMessage("Value must be a number")
+  body("value").isNumeric().withMessage("Value must be a number"),
+  body("description").isNumeric().withMessage("description 404")
 ]
 
-app.post("/api", validateData, async (req: Request, res: Response) => {
+app.post("/api", validateData, authenticateToken, async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -118,28 +115,10 @@ app.post("/api", validateData, async (req: Request, res: Response) => {
     }
 
     // Extract data from the request body
-    const { username, date, value, description } = req.body
+    const { date, value, description } = req.body
 
-    if (!username || !date || value === undefined) {
-      return res.status(400).json({ error: "Missing required fields" })
-    }
-
-    // Find the user ID for the given username
-    let userResult = await client.query("SELECT id FROM users WHERE username = $1", [username])
-
-    let userId: number
-
-    if (userResult.rows.length === 0) {
-      // User not found, create the user
-      await client.query("INSERT INTO users (username) VALUES ($1)", [username])
-
-      // Retrieve the newly created user ID
-      userResult = await client.query("SELECT id FROM users WHERE username = $1", [username])
-      userId = userResult.rows[0].id
-    } else {
-      // User found, use the existing user ID
-      userId = userResult.rows[0].id
-    }
+    // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
+    const userId = req.user.userId
 
     // Insert the new data
     const query = `
@@ -160,7 +139,7 @@ app.post("/api", validateData, async (req: Request, res: Response) => {
   }
 })
 
-app.delete("/api/:id", async (req: Request, res: Response) => {
+app.delete("/api/:id", authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 

@@ -5,9 +5,9 @@ import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 
-import { deleteData, postData } from "../api"
+import { deleteData, login, postData } from "../api"
 import { COLORS } from "../constants"
-import { modalDayData, showModal, userDataAtom, userNameAtom } from "../store"
+import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
 import { sumValues } from "../utils"
 import { Tooltip as ReactTooltip } from "react-tooltip"
@@ -21,7 +21,7 @@ type Props = {
   headerColumn?: boolean
 }
 
-export const MonthRow = ({ days, start, end, headerColumn }: Props) => {
+export const MonthRow = ({ days, start, end }: Props) => {
   const setModalData = useSetAtom(modalDayData)
   const setShowModal = useSetAtom(showModal)
   const userData = useAtomValue(userDataAtom)
@@ -169,10 +169,7 @@ export const ModalForm = ({ data }: { data: DayInfo | null }) => {
   const formattedDate = dayjs(data?.date).format("YYYY-MM-DDTHH:mm:ss")
   const setShowModal = useSetAtom(showModal)
 
-  const username = useAtomValue(userNameAtom)
-
   const payload = {
-    username: username ?? "",
     date: formattedDate,
     value: val,
     description
@@ -182,10 +179,7 @@ export const ModalForm = ({ data }: { data: DayInfo | null }) => {
     setLoading(true)
     e.preventDefault()
 
-    if (username) {
-      await postData(username, payload)
-    }
-
+    await postData(payload)
     setVal("")
     setShowModal(false)
     setLoading(false)
@@ -219,27 +213,38 @@ export const ModalForm = ({ data }: { data: DayInfo | null }) => {
   )
 }
 
-export const ModalUserForm = () => {
-  const [val, setVal] = useState("")
+export const ModalLoginForm = () => {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const setShowModal = useSetAtom(showModal)
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    window.localStorage.setItem("username", val)
+    const res = await login({ username, password })
+    if (res.token) {
+      window.localStorage.setItem("token", res.token)
 
-    setVal("")
-    setShowModal(false)
+      setShowModal(false)
+    }
   }
 
   return (
     <form onSubmit={onSubmit}>
       <input
-        placeholder="Who are you?"
+        placeholder="Username"
         type="text"
-        value={val}
+        value={username}
         onChange={(e) => {
-          setVal(e.currentTarget.value)
+          setUsername(e.currentTarget.value)
+        }}
+      />
+      <input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={(e) => {
+          setPassword(e.currentTarget.value)
         }}
       />
       <button type="submit">submit</button>
