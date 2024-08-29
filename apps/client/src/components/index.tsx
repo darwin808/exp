@@ -3,6 +3,7 @@
  */
 import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
+import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 import { Tooltip as ReactTooltip } from "react-tooltip"
 
@@ -113,12 +114,16 @@ export const HeaderComp = ({
   setCurrentMonth,
   setCurrentYear
 }: headerCompProps) => {
+  const [showMoney, setShowMoney] = useState(false)
+
   const userData = useAtomValue(userDataAtom)
   const totalMoney = sumValues(userData)
-  const finalMoney = Number(totalMoney.toFixed(2)).toLocaleString()
 
   const date = dayjs(`${currentMonth}/${currentDay}/${currentYear}`)
   const formattedDate = date.format("MMMM YYYY")
+
+  const money = Number(totalMoney.toFixed(2)).toLocaleString()
+  const finalMoney = showMoney ? money : money.replace(/./g, "*")
 
   return (
     <header className="flex justify-between p-2">
@@ -156,8 +161,15 @@ export const HeaderComp = ({
         </div>
       </div>
       <div className="flex  w-full justify-end  px-4">
-        <div className="flex h-full w-64   items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/80">
+        <div className="flex h-full w-64  justify-between  items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/80">
           <h1>$ {finalMoney}</h1>
+          <button
+            onClick={() => {
+              setShowMoney(!showMoney)
+            }}
+          >
+            {!showMoney ? <EyeOff /> : <Eye />}
+          </button>
         </div>
       </div>
     </header>
