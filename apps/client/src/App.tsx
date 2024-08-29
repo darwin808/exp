@@ -57,7 +57,7 @@ const App = () => {
       <div className="font-Regular h-auo w-screen  bg-white">
         <HeaderComp {...headerCompProps} />
         <div className="flex flex-row">
-          <div className="h-full w-96">
+          <div className="h-full w-60">
             <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
             <button
               className="bg-red-400 rounded-full px-2 text-xs py-1"

@@ -1,3 +1,7 @@
+# Server
+
+express node postgress
+
 Requirements
 node 22
 pnpm 9
