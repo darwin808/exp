@@ -21,7 +21,7 @@ type Props = {
   headerColumn?: boolean
 }
 
-export const MonthRow = ({ days, start, end }: Props) => {
+export const MonthRow = ({ days, start, end, headerColumn = false }: Props) => {
   const setModalData = useSetAtom(modalDayData)
   const setShowModal = useSetAtom(showModal)
   const userData = useAtomValue(userDataAtom)
@@ -33,7 +33,7 @@ export const MonthRow = ({ days, start, end }: Props) => {
     }
   }
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row ">
       {days?.slice(start, end)?.map((e: DayInfo | null, i: number) => {
         const currentDate = dayjs().format("YYYY-MM-DD")
         const isDateToday = currentDate === e?.date
@@ -48,8 +48,10 @@ export const MonthRow = ({ days, start, end }: Props) => {
               }
             }}
             key={i}
-            className={`hover:bg-gray-200 transition-all size-32 border-2 rounded-lg border-black  ${isDateToday ? "bg-gray-300" : "bg-transparent"}`}
+            className={`m-1 hover:shadow-xl  hover:bg-gray-200 transition-all size-32 ring-1 ring-gray-100 rounded-lg   ${isDateToday ? "bg-gray-300" : "bg-transparent"}`}
           >
+            {headerColumn && <span className=" p-2 text-center text-sm">{e?.day}</span>}
+
             <h1
               className="text-center text-2xl"
               style={{
@@ -78,7 +80,7 @@ export const MonthRow = ({ days, start, end }: Props) => {
                       <button
                         onClick={(event) => {
                           event.stopPropagation()
-                          deleteData(x?.item_id ?? 0, x.username)
+                          deleteData(x?.item_id ?? 0)
                         }}
                       >
                         X

@@ -54,7 +54,7 @@ const App = () => {
       <Modal>
         <ModalForm data={modalData} />
       </Modal>
-      <div className="font-Regular h-screen w-screen overflow-hidden bg-white">
+      <div className="font-Regular h-auo w-screen  bg-white">
         <HeaderComp {...headerCompProps} />
         <div className="flex flex-row">
           <div className="h-full w-96">
