@@ -123,7 +123,7 @@ export const HeaderComp = ({
   const formattedDate = date.format("MMMM YYYY")
 
   const money = Number(totalMoney.toFixed(2)).toLocaleString()
-  const finalMoney = showMoney ? money : money.replace(/./g, "*")
+  const finalMoney = showMoney ? money : "*******"
 
   return (
     <header className="flex justify-between p-2">
