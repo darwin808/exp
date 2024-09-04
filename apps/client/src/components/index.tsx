@@ -1,17 +1,32 @@
 /**
  * Property of Darwin Apolinario
  */
+import { zodResolver } from "@hookform/resolvers/zod"
 import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Tooltip as ReactTooltip } from "react-tooltip"
+import { z } from "zod"
 
 import { deleteData, login, postData, register } from "../api"
 import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
+import { Button } from "./button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "./form"
+import { Input } from "./input"
 
+export * from "./form"
 export { Modal } from "./modal"
 
 type Props = {
@@ -173,56 +188,74 @@ export const HeaderComp = ({
   )
 }
 
+const formSchema = z.object({
+  val: z.coerce.number(),
+  description: z.string().min(2, {
+    message: "Description must be at least 2 characters."
+  })
+})
+
 export const ModalForm = ({ data }: { data: DayInfo | null }) => {
   const [loading, setLoading] = useState(false)
-  const [val, setVal] = useState("")
-  const [description, setDescription] = useState("")
   const formattedDate = dayjs(data?.date).format("YYYY-MM-DDTHH:mm:ss")
   const setShowModal = useSetAtom(showModal)
 
-  const payload = {
-    date: formattedDate,
-    value: val,
-    description
-  }
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!loading && val && description) {
-      setLoading(true)
-
-      await postData(payload)
-      setVal("")
-      setShowModal(false)
-      setLoading(false)
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      description: ""
     }
-  }
+  })
 
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true)
+
+    const payload = {
+      date: formattedDate,
+      value: String(values.val),
+      description: values.description
+    }
+    if (values.val) {
+      await postData(payload)
+    }
+
+    setLoading(false)
+    setShowModal(false)
+  }
   return (
-    <form onSubmit={onSubmit} className="flex">
-      <div className="flex flex-col">
-        <input
-          autoFocus
-          placeholder="enter a number"
-          type="text"
-          value={val}
-          onChange={(e) => {
-            setVal(e.currentTarget.value)
-          }}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="val"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Amount</FormLabel>
+              <FormControl>
+                <Input autoFocus placeholder="Amount" type="number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <input
-          placeholder="Description"
-          type="text"
-          value={description}
-          onChange={(e) => {
-            setDescription(e.currentTarget.value)
-          }}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <button type="submit" className="bg-red-50 p-2" disabled={loading}>
-        submit
-      </button>
-    </form>
+        <Button disabled={loading} type="submit">
+          Submit
+        </Button>
+      </form>
+    </Form>
   )
 }
 

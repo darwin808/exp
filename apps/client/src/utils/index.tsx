@@ -1,9 +1,15 @@
 /**
  * Property of Darwin Apolinario
  */
+import { type ClassValue, clsx } from "clsx"
 import dayjs from "dayjs"
+import { twMerge } from "tailwind-merge"
 
 import { DayInfo, DaysOfMonth, userData, WeekDay } from "../types"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 export const getDaysOfMonth = (month: number, year: number): DaysOfMonth => {
   if (month < 1 || month > 12) {
