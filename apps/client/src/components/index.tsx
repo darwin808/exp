@@ -49,7 +49,7 @@ export const MonthRow = ({ days, start, end, headerColumn = false }: Props) => {
               }
             }}
             key={i}
-            className={`m-1 hover:shadow-xl  hover:bg-gray-200 transition-all size-32 ring-1 ring-gray-100 rounded-lg   ${isDateToday ? "bg-gray-300" : "bg-transparent"}`}
+            className={`m-1 hover:shadow-xl   transition-all size-32 ring-1 ring-gray-100 rounded-lg   ${isDateToday ? "border-2 border-red-600 bg-red-50 bg-opacity-25 " : "border-0 bg-transparent hover:bg-gray-200"}`}
           >
             {headerColumn && <span className=" p-2 text-center text-sm">{e?.day}</span>}
 
