@@ -31,7 +31,8 @@ const App = () => {
     currentYear,
     currentMonth,
     setCurrentYear,
-    setCurrentMonth
+    setCurrentMonth,
+    totalValue: verify?.data?.user?.total_value
   }
 
   useEffect(() => {

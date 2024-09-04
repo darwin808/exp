@@ -4,7 +4,7 @@
 import axios from "axios"
 import useSWR, { mutate } from "swr"
 
-import { userData } from "../types"
+import { userData, VerifyResponse } from "../types"
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -17,7 +17,7 @@ const fetcher = async (url: string): Promise<userData[]> =>
   axiosInstance.get(url).then((res) => res.data)
 
 export const useUserData = () => {
-  const { data, error, isLoading } = useSWR(`/api`, fetcher)
+  const { data, error, isLoading } = useSWR<userData[]>(`/api`, fetcher)
 
   return {
     data,
@@ -25,16 +25,20 @@ export const useUserData = () => {
     isError: error
   }
 }
+
+const fetcherVerify = async (url: string): Promise<VerifyResponse> =>
+  axiosInstance.get(url).then((res) => res.data)
 
 export const useVerify = () => {
-  const { data, error, isLoading } = useSWR(`/verify`, fetcher)
+  const { data, error, isLoading } = useSWR<VerifyResponse>("/verify", fetcherVerify)
 
   return {
     data,
     isLoading,
-    isError: error
+    isError: !!error
   }
 }
+
 type LoginBody = {
   username: string
   password: string
@@ -72,6 +76,7 @@ export const postData = async (newData: userData) => {
       ...newData
     })
     mutate(`/api`)
+    mutate(`/verify`)
   } catch (error) {
     console.error("Error posting data:", error)
   }
@@ -82,6 +87,7 @@ export const deleteData = async (id: number) => {
     await axiosInstance.delete(`/api/${id}`)
 
     mutate(`/api`)
+    mutate(`/verify`)
   } catch (error) {
     console.error("Error deleting data:", error)
     throw error

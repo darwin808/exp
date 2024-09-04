@@ -11,7 +11,6 @@ import { deleteData, login, postData, register } from "../api"
 import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
-import { sumValues } from "../utils"
 
 export { Modal } from "./modal"
 
@@ -105,6 +104,7 @@ type headerCompProps = {
   currentMonth: number
   setCurrentYear: (e: number) => void
   setCurrentMonth: (e: number) => void
+  totalValue?: string
 }
 
 export const HeaderComp = ({
@@ -112,18 +112,15 @@ export const HeaderComp = ({
   currentYear,
   currentDay,
   setCurrentMonth,
-  setCurrentYear
+  setCurrentYear,
+  totalValue = "0"
 }: headerCompProps) => {
   const [showMoney, setShowMoney] = useState(false)
-
-  const userData = useAtomValue(userDataAtom)
-  const totalMoney = sumValues(userData)
 
   const date = dayjs(`${currentMonth}/${currentDay}/${currentYear}`)
   const formattedDate = date.format("MMMM YYYY")
 
-  const money = Number(totalMoney.toFixed(2)).toLocaleString()
-  const finalMoney = showMoney ? money : "*******"
+  const finalMoney = showMoney ? totalValue : "*******"
 
   return (
     <header className="flex justify-between p-2">

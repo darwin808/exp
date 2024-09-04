@@ -65,11 +65,16 @@ app.get("/verify", authenticateToken, async (req, res) => {
     const query = `SELECT id, email, username from exp_users WHERE id = $1`
 
     // @ts-expect-error: We assume `req.user` exists after authentication
-    const user = req.user
+    const userId = req.user.userId
 
-    const result = await client.query(query, [user.userId])
+    const result = await client.query(query, [userId])
+    const resultVal = await client.query(
+      "SELECT SUM(value) AS total_value FROM user_data WHERE user_id = $1",
+      [userId]
+    )
 
-    res.status(200).json({ message: "Token is valid", user: result.rows[0], login: true })
+    const user = { ...result.rows[0], total_value: resultVal.rows[0].total_value }
+    res.status(200).json({ message: "Token is valid", user, login: true })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: "Internal server error" })

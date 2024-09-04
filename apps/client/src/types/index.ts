@@ -31,3 +31,16 @@ export type userData = {
   item_id?: number
   description?: string
 }
+
+type User = {
+  id: number
+  email: string
+  username: string
+  total_value: string // If it's a string, keep it as a string
+}
+
+export type VerifyResponse = {
+  message: string
+  user: User
+  login: boolean
+}
