@@ -173,7 +173,7 @@ export const HeaderComp = ({
         </div>
       </div>
       <div className="flex  w-full justify-end  px-4">
-        <div className="flex h-full w-64  justify-between  items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/80">
+        <div className="flex h-full w-72  justify-between  items-center rounded-lg border-2 border-black bg-yellow-100 px-2 text-center text-4xl transition-all  hover:bg-yellow-100/90">
           <h1>$ {finalMoney}</h1>
           <button
             onClick={() => {
