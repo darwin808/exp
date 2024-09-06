@@ -20,8 +20,7 @@ export const LoginScreen = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Login</h1>
+    <div className="absolute inset-0 flex justify-center items-center bg-gray-200">
       <ModalLoginForm />
     </div>
   )
