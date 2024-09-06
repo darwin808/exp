@@ -30,7 +30,10 @@ const fetcherVerify = async (url: string): Promise<VerifyResponse> =>
   axiosInstance.get(url).then((res) => res.data)
 
 export const useVerify = () => {
-  const { data, error, isLoading } = useSWR<VerifyResponse>("/verify", fetcherVerify)
+  const { data, error, isLoading } = useSWR<VerifyResponse>(
+    window.localStorage.getItem("token") ? "/verify" : null,
+    fetcherVerify
+  )
 
   return {
     data,

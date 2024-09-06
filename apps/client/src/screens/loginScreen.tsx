@@ -21,7 +21,7 @@ export const LoginScreen = () => {
 
   return (
     <div>
-      Login
+      <h1 className="text-2xl font-bold">Login</h1>
       <ModalLoginForm />
     </div>
   )

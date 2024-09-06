@@ -224,7 +224,7 @@ export const ModalForm = ({ data }: { data: DayInfo | null }) => {
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-96">
         <FormField
           control={form.control}
           name="val"
@@ -259,43 +259,75 @@ export const ModalForm = ({ data }: { data: DayInfo | null }) => {
   )
 }
 
+const loginSchema = z.object({
+  username: z.string().min(2),
+  password: z.string().min(2, {
+    message: "Description must be at least 2 characters."
+  })
+})
+
 export const ModalLoginForm = () => {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   const setShowModal = useSetAtom(showModal)
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {}
+  })
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      setLoading(true)
+      const { username, password } = values
+      const res = await login({ username, password })
+      if (res.token) {
+        window.localStorage.setItem("token", res.token)
 
-    const res = await login({ username, password })
-    if (res.token) {
-      window.localStorage.setItem("token", res.token)
-
+        setShowModal(false)
+        window.location.replace("/")
+      }
       setShowModal(false)
-      window.location.replace("/")
+      setLoading(false)
+    } catch (error) {
+      console.error(error)
+      setShowModal(false)
+      setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col">
-      <input
-        placeholder="Username"
-        type="text"
-        value={username}
-        onChange={(e) => {
-          setUsername(e.currentTarget.value)
-        }}
-      />
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => {
-          setPassword(e.currentTarget.value)
-        }}
-      />
-      <button type="submit">submit</button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-96">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input autoFocus placeholder="Username" type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input placeholder="Password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button disabled={loading} type="submit">
+          Submit
+        </Button>
+      </form>
+    </Form>
   )
 }
 
