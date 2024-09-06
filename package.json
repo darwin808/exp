@@ -7,7 +7,7 @@
     "preview": "turbo preview",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "start": "pnpm build && turbo start",
+    "start": "pnpm build && pnpm --filter exp_* --parallel start",
     "check-types": "turbo check-types",
     "prepare": "husky install && npm run prepare:dev",
     "prepare:dev": "chmod ug+x .husky/*",
