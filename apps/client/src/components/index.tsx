@@ -15,15 +15,7 @@ import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
 import { DayInfo } from "../types"
 import { Button } from "./button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "./form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./form"
 import { Input } from "./input"
 
 export * from "./form"
@@ -317,7 +309,7 @@ export const ModalLoginForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="Password" {...field} />
+                <Input placeholder="Password" type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
