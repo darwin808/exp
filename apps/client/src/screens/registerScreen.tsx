@@ -19,8 +19,7 @@ export const RegisterScreen = () => {
     return <div>loading</div>
   }
   return (
-    <div>
-      Register
+    <div className="absolute inset-0 flex justify-center items-center bg-gray-200">
       <SignupForm />
     </div>
   )

@@ -326,49 +326,91 @@ export const ModalLoginForm = () => {
   )
 }
 
+const registerSchema = z.object({
+  username: z.string().min(2),
+  password: z.string().min(2, {
+    message: "Password must be at least 2 characters."
+  }),
+  email: z.string().email().min(2)
+})
 export const SignupForm = () => {
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const setShowModal = useSetAtom(showModal)
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {}
+  })
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    try {
+      setLoading(true)
+      const { username, password, email } = values
 
-    const res = await register({ username, password, email })
-    if (res.token) {
-      window.localStorage.setItem("token", res.token)
+      const res = await register({ username, password, email })
+      if (res.token) {
+        window.localStorage.setItem("token", res.token)
 
-      window.location.replace("/")
+        window.location.replace("/")
+      }
+
+      setShowModal(false)
+      setLoading(false)
+    } catch (error) {
+      console.error(error)
+      setShowModal(false)
+      setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col">
-      <input
-        placeholder="Username"
-        type="text"
-        value={username}
-        onChange={(e) => {
-          setUsername(e.currentTarget.value)
-        }}
-      />
-      <input
-        placeholder="email"
-        type="text"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.currentTarget.value)
-        }}
-      />
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => {
-          setPassword(e.currentTarget.value)
-        }}
-      />
-      <button type="submit">submit</button>
-    </form>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="bg-white space-y-2 w-96 shadow-2xl  p-6 rounded-xl"
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input autoFocus placeholder="Email" type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="Username" type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input placeholder="Password" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button disabled={loading} type="submit">
+          Submit
+        </Button>
+      </form>
+    </Form>
   )
 }
