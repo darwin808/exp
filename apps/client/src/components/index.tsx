@@ -130,7 +130,7 @@ export const HeaderComp = ({
   const finalMoney = showMoney ? totalValue : "*******"
 
   return (
-    <header className="flex justify-between p-2">
+    <header className="flex justify-between py-2 px-4  w-full">
       <div>
         <h1 className="w-96 text-4xl">{formattedDate}</h1>
 

@@ -14,6 +14,37 @@ import { modalDayData, userDataAtom } from "./store"
 import { DayInfo } from "./types"
 import { generateDays } from "./utils"
 
+const LeftNav = ({ verify }: any) => {
+  return (
+    <div className="flex flex-row">
+      <div className="h-full w-60">
+        <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
+        <button
+          className="bg-red-400 rounded-full px-2 text-xs py-1"
+          onClick={() => {
+            window.localStorage.removeItem("token")
+            window.location.replace("/login")
+          }}
+        >
+          Log out
+        </button>
+      </div>
+    </div>
+  )
+}
+
+const RightBody = ({ daysOfTheMonth }: any) => {
+  return (
+    <div className="flex size-full flex-col">
+      <MonthRow days={daysOfTheMonth} start={0} end={7} headerColumn={true} />
+      <MonthRow days={daysOfTheMonth} start={7} end={14} />
+      <MonthRow days={daysOfTheMonth} start={14} end={21} />
+      <MonthRow days={daysOfTheMonth} start={21} end={28} />
+      <MonthRow days={daysOfTheMonth} start={28} end={35} />
+    </div>
+  )
+}
+
 const App = () => {
   const userData = useUserData()
   const verify = useVerify()
@@ -55,31 +86,20 @@ const App = () => {
       <Modal>
         <ModalForm data={modalData} />
       </Modal>
-      <div className="font-Regular h-auo w-screen  bg-white">
-        <HeaderComp {...headerCompProps} />
-        <div className="flex flex-row">
-          <div className="h-full w-60">
-            <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
-            <button
-              className="bg-red-400 rounded-full px-2 text-xs py-1"
-              onClick={() => {
-                window.localStorage.removeItem("token")
-                window.location.replace("/login")
-              }}
-            >
-              Log out
-            </button>
-          </div>
+      <main className="font-Regular h-screen w-screen  bg-white">
+        <header className="header flex  w-full h-32 border-b-2">
+          <HeaderComp {...headerCompProps} />
+        </header>
+        <section className="body flex flex-row w-full h-full ">
+          <nav className="left_body w-1/4 h-full border-r-2">
+            <LeftNav verify={verify} />
+          </nav>
 
-          <div className="flex size-full flex-col">
-            <MonthRow days={daysOfTheMonth} start={0} end={7} headerColumn={true} />
-            <MonthRow days={daysOfTheMonth} start={7} end={14} />
-            <MonthRow days={daysOfTheMonth} start={14} end={21} />
-            <MonthRow days={daysOfTheMonth} start={21} end={28} />
-            <MonthRow days={daysOfTheMonth} start={28} end={35} />
+          <div className="right_body w-3/4 h-full flex justify-center align-center">
+            <RightBody daysOfTheMonth={daysOfTheMonth} />
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </>
   )
 }
