@@ -246,6 +246,6 @@ app.post("/login", async (req: Request, res: Response) => {
   }
 })
 
-app.listen(port, () => {
-  console.error(`Server is running on port ${port}`)
-})
+app.listen(port, () => {})
+
+export default app

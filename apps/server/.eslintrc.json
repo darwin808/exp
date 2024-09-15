@@ -21,7 +21,7 @@
 
   "overrides": [
     {
-      "files": ["./src/App.tsx"],
+      "files": ["./src/index.ts"],
       "rules": {
         "import/no-default-export": "off"
       }
@@ -101,7 +101,7 @@
     "react/prop-types": "off",
     "@tanstack/query/exhaustive-deps": "error",
     "valid-jsdoc": "off",
-    "no-console": ["error", { "allow": ["error"] }],
+    "no-console": ["warn", { "allow": ["error"] }],
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
     "import/first": "error",
