@@ -12,7 +12,7 @@ import { HeaderComp, LeftNav, Modal, ModalForm, RightBody } from "./components"
 import { RegisterScreen } from "./screens"
 import { LoginScreen } from "./screens/loginScreen"
 import { modalDayData, userDataAtom } from "./store"
-import { Verify } from "./types"
+import { DaysOfTheMonth, Verify } from "./types"
 import { generateDays } from "./utils"
 
 const App = () => {
@@ -21,7 +21,7 @@ const App = () => {
 
   const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1)
   const [currentYear, setCurrentYear] = useState(dayjs().year())
-  const [daysOfTheMonth, setDaysOfTheMonth] = useState<daysOfTheMonth>([null])
+  const [daysOfTheMonth, setDaysOfTheMonth] = useState<DaysOfTheMonth>([null])
 
   const currentDay = dayjs().date()
   const modalData = useAtomValue(modalDayData)

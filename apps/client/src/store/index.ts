@@ -11,3 +11,5 @@ export const modalDayData = atom<DayInfo | null>(null)
 
 export const userDataAtom = atom<userData[]>([])
 export const userNameAtom = atom<string | null>(null)
+
+export const loading = atom<boolean>(false)
