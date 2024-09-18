@@ -2,6 +2,7 @@
  * Property of Darwin Apolinario
  */
 import axios from "axios"
+import { toast } from "react-toastify"
 import useSWR, { mutate } from "swr"
 
 import { userData, VerifyResponse } from "../types"
@@ -59,7 +60,8 @@ export const login = async (body: LoginBody) => {
     })
     return res.data
   } catch (error) {
-    console.error("Error posting data:", error)
+    toast.error(error?.message)
+    console.error("Error posting data:", error?.message)
   }
 }
 export const register = async (body: RegisterBody) => {
@@ -69,6 +71,7 @@ export const register = async (body: RegisterBody) => {
     })
     return res.data
   } catch (error) {
+    toast.error(error?.message)
     console.error("Error posting data:", error)
   }
 }
@@ -81,6 +84,7 @@ export const postData = async (newData: userData) => {
     mutate(`/api`)
     mutate(`/verify`)
   } catch (error) {
+    toast.error(error?.message)
     console.error("Error posting data:", error)
   }
 }
@@ -92,6 +96,7 @@ export const deleteData = async (id: number) => {
     mutate(`/api`)
     mutate(`/verify`)
   } catch (error) {
+    toast.error(error?.message)
     console.error("Error deleting data:", error)
     throw error
   }
