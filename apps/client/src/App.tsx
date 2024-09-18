@@ -8,51 +8,20 @@ import { ErrorBoundary } from "react-error-boundary"
 import { Outlet, Route, Routes } from "react-router-dom"
 
 import { useUserData, useVerify } from "./api"
-import { FallbackRender, HeaderComp, Modal, ModalForm, MonthRow } from "./components"
+import { HeaderComp, LeftNav, Modal, ModalForm, RightBody } from "./components"
 import { RegisterScreen } from "./screens"
 import { LoginScreen } from "./screens/loginScreen"
 import { modalDayData, userDataAtom } from "./store"
-import { DayInfo } from "./types"
+import { Verify } from "./types"
 import { generateDays } from "./utils"
-
-const LeftNav = ({ verify }: any) => {
-  return (
-    <div className="flex flex-row">
-      <div className="h-full w-60">
-        <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
-        <button
-          className="bg-red-400 rounded-full px-2 text-xs py-1"
-          onClick={() => {
-            window.localStorage.removeItem("token")
-            window.location.replace("/login")
-          }}
-        >
-          Log out
-        </button>
-      </div>
-    </div>
-  )
-}
-
-const RightBody = ({ daysOfTheMonth }: any) => {
-  return (
-    <div className="flex size-full flex-col">
-      <MonthRow days={daysOfTheMonth} start={0} end={7} headerColumn={true} />
-      <MonthRow days={daysOfTheMonth} start={7} end={14} />
-      <MonthRow days={daysOfTheMonth} start={14} end={21} />
-      <MonthRow days={daysOfTheMonth} start={21} end={28} />
-      <MonthRow days={daysOfTheMonth} start={28} end={35} />
-    </div>
-  )
-}
 
 const App = () => {
   const userData = useUserData()
-  const verify = useVerify()
+  const verify: Verify = useVerify()
 
   const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1)
   const [currentYear, setCurrentYear] = useState(dayjs().year())
-  const [daysOfTheMonth, setDaysOfTheMonth] = useState<(DayInfo | null)[]>([null])
+  const [daysOfTheMonth, setDaysOfTheMonth] = useState<daysOfTheMonth>([null])
 
   const currentDay = dayjs().date()
   const modalData = useAtomValue(modalDayData)

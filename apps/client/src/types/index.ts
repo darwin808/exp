@@ -44,3 +44,11 @@ export type VerifyResponse = {
   user: User
   login: boolean
 }
+
+export type Verify = {
+  data: VerifyResponse | undefined
+  isLoading: boolean
+  isError: boolean
+}
+
+export type DaysOfTheMonth = (DayInfo | null)[]

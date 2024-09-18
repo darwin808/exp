@@ -13,7 +13,7 @@ import { z } from "zod"
 import { deleteData, login, postData, register } from "../api"
 import { COLORS } from "../constants"
 import { modalDayData, showModal, userDataAtom } from "../store"
-import { DayInfo } from "../types"
+import { DayInfo, DaysOfTheMonth, Verify } from "../types"
 import { Button } from "./button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./form"
 import { Input } from "./input"
@@ -415,18 +415,33 @@ export const SignupForm = () => {
   )
 }
 
-export const FallbackRender = ({ error, resetErrorBoundary }: any) => {
+export const LeftNav = ({ verify }: { verify: Verify }) => {
   return (
-    <div role="alert">
-      <p>Something went wrong:</p>
-      <pre style={{ color: "red" }}>{error.message}</pre>
-      <button
-        onClick={() => {
-          resetErrorBoundary()
-        }}
-      >
-        retry
-      </button>
+    <div className="flex flex-row">
+      <div className="h-full w-60">
+        <h1 className="w-96 text-xl">Hello {verify?.data?.user?.username}</h1>
+        <button
+          className="bg-red-400 rounded-full px-2 text-xs py-1"
+          onClick={() => {
+            window.localStorage.removeItem("token")
+            window.location.replace("/login")
+          }}
+        >
+          Log out
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export const RightBody = ({ daysOfTheMonth }: { daysOfTheMonth: DaysOfTheMonth }) => {
+  return (
+    <div className="flex size-full flex-col">
+      <MonthRow days={daysOfTheMonth} start={0} end={7} headerColumn={true} />
+      <MonthRow days={daysOfTheMonth} start={7} end={14} />
+      <MonthRow days={daysOfTheMonth} start={14} end={21} />
+      <MonthRow days={daysOfTheMonth} start={21} end={28} />
+      <MonthRow days={daysOfTheMonth} start={28} end={35} />
     </div>
   )
 }
