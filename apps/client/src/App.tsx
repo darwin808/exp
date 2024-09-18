@@ -4,10 +4,11 @@
 import dayjs from "dayjs"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
+import { ErrorBoundary } from "react-error-boundary"
 import { Outlet, Route, Routes } from "react-router-dom"
 
 import { useUserData, useVerify } from "./api"
-import { HeaderComp, Modal, ModalForm, MonthRow } from "./components"
+import { FallbackRender, HeaderComp, Modal, ModalForm, MonthRow } from "./components"
 import { RegisterScreen } from "./screens"
 import { LoginScreen } from "./screens/loginScreen"
 import { modalDayData, userDataAtom } from "./store"
@@ -88,15 +89,21 @@ const App = () => {
       </Modal>
       <main className="font-Regular h-screen w-screen  bg-white">
         <header className="header flex  w-full h-32 border-b-2">
-          <HeaderComp {...headerCompProps} />
+          <ErrorBoundary fallback={<div>error</div>}>
+            <HeaderComp {...headerCompProps} />
+          </ErrorBoundary>
         </header>
         <section className="body flex flex-row w-full h-full ">
-          <nav className="left_body w-1/4 h-full border-r-2">
-            <LeftNav verify={verify} />
-          </nav>
+          <ErrorBoundary fallback={<div>error</div>}>
+            <nav className="left_body w-1/4 h-full border-r-2">
+              <LeftNav verify={verify} />
+            </nav>
+          </ErrorBoundary>
 
           <div className="right_body w-3/4 h-full flex justify-center align-center">
-            <RightBody daysOfTheMonth={daysOfTheMonth} />
+            <ErrorBoundary fallback={<div>error</div>}>
+              <RightBody daysOfTheMonth={daysOfTheMonth} />
+            </ErrorBoundary>
           </div>
         </section>
       </main>

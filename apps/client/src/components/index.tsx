@@ -414,3 +414,19 @@ export const SignupForm = () => {
     </Form>
   )
 }
+
+export const FallbackRender = ({ error, resetErrorBoundary }: any) => {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+      <button
+        onClick={() => {
+          resetErrorBoundary()
+        }}
+      >
+        retry
+      </button>
+    </div>
+  )
+}
