@@ -28,6 +28,25 @@ type Props = {
   headerColumn?: boolean
 }
 
+const Xicon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  )
+}
+
 export const MonthRow = ({ days, start, end, headerColumn = false }: Props) => {
   const setModalData = useSetAtom(modalDayData)
   const setShowModal = useSetAtom(showModal)
@@ -48,6 +67,7 @@ export const MonthRow = ({ days, start, end, headerColumn = false }: Props) => {
         const isWeekend = e?.day === "sunday" || e?.day === "saturday"
         return (
           <div
+            style={{ width: "150px", height: "130px" }}
             onClick={(event) => {
               event.stopPropagation()
               if (e) {
@@ -55,7 +75,7 @@ export const MonthRow = ({ days, start, end, headerColumn = false }: Props) => {
               }
             }}
             key={i}
-            className={`m-1 hover:shadow-xl   transition-all size-32 ring-1 ring-gray-100 rounded-lg   ${isDateToday ? "border-2 border-red-600 bg-red-50 bg-opacity-25 " : "border-0 bg-transparent hover:bg-gray-200"}`}
+            className={`m-1 hover:shadow-xl   transition-all  ring-1 ring-gray-100 rounded-lg   ${isDateToday ? "border-2 border-red-600 bg-red-50 bg-opacity-25 " : "border-0 bg-transparent hover:bg-gray-200"}`}
           >
             {headerColumn && <span className=" p-2 text-center text-sm">{e?.day}</span>}
 
@@ -73,26 +93,39 @@ export const MonthRow = ({ days, start, end, headerColumn = false }: Props) => {
                 const id = `react-tooltip-${x.item_id}`
                 if (x.date === e?.date) {
                   return (
-                    <button
-                      id={id}
-                      key={i}
-                      className="flex px-1 py-0.5 text-[8px] justify-between border min-w-14 rounded-sm hover:opacity-80 transition-all font-bold"
+                    <div
                       style={{
-                        color: x.value.includes("-") ? COLORS.red : COLORS.green,
                         borderColor: x.value.includes("-") ? COLORS.red : COLORS.green
                       }}
+                      className="flex px-1 py-0.5 text-[8px] justify-between border   rounded-sm hover:opacity-80 transition-all font-bold"
                     >
-                      {x.value}
-                      <ReactTooltip anchorSelect={"#" + id} content={x?.description ?? ""} />
                       <button
+                        id={id}
+                        key={i}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                        }}
+                        style={{
+                          color: x.value.includes("-") ? COLORS.red : COLORS.green,
+                          borderColor: x.value.includes("-") ? COLORS.red : COLORS.green
+                        }}
+                      >
+                        {x.value}
+                        <ReactTooltip anchorSelect={"#" + id} content={x?.description ?? ""} />
+                      </button>
+                      <div className="w-1"></div>
+
+                      <button
+                        title="remove item"
                         onClick={(event) => {
                           event.stopPropagation()
                           deleteData(x?.item_id ?? 0)
                         }}
                       >
-                        X
+                        <Xicon />
                       </button>
-                    </button>
+                    </div>
                   )
                 }
                 return null
