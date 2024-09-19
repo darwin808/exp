@@ -65,12 +65,12 @@ const App = () => {
         </header>
         <section className="body flex flex-row w-full h-full ">
           <ErrorBoundary fallback={<div>error</div>}>
-            <nav className="left_body w-1/4 h-full border-r-2">
+            <nav className="left_body w-1/5 h-full border-r-2">
               <LeftNav verify={verify} />
             </nav>
           </ErrorBoundary>
 
-          <div className="right_body w-3/4 h-full flex justify-center align-center">
+          <div className="right_body w-4/5  h-full flex justify-center align-center">
             <ErrorBoundary fallback={<div>error</div>}>
               <RightBody daysOfTheMonth={daysOfTheMonth} />
             </ErrorBoundary>
