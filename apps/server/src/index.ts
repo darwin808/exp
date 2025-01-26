@@ -1,13 +1,13 @@
 /**
  * Property of the Darwin Apolinario
  */
+import { createClient } from "@supabase/supabase-js"
 import bcrypt from "bcryptjs"
 import cors from "cors"
 import dotenv from "dotenv"
 import express, { Request, Response } from "express"
 import { body, validationResult } from "express-validator"
 import jwt from "jsonwebtoken"
-import { Client } from "pg"
 
 // Initialize dotenv to load environment variables
 dotenv.config()
@@ -15,21 +15,10 @@ dotenv.config()
 const app = express()
 const port = process.env.SERVER_PORT ?? 4000
 
-// Database connection details
-const user = process.env.DB_USER as string
-const password = process.env.DB_PASSWORD as string
-const host = process.env.DB_HOST as string
-const database = process.env.DATABASE as string
-const dbPort = process.env.DB_PORT as string
-
-const client = new Client({
-  user,
-  password,
-  host,
-  database,
-  port: parseInt(dbPort)
-})
-client.connect()
+const supabase = createClient(
+  process.env.SUPABASE_PROJECT_ID as string,
+  process.env.SUPABASE_API_KEY as string
+)
 
 app.use(express.json())
 app.use(cors())
@@ -45,7 +34,6 @@ const authenticateToken = (
   if (!token) {
     return res.status(401).json({ error: "Missing token" })
   }
-
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       return res.status(403).json({ error: "Invalid token" })
@@ -58,28 +46,62 @@ const authenticateToken = (
 
   return
 }
-
+/**
+ * Calculates the sum of the `value` property for each object in the given array.
+ *
+ * @param {Array<{value: number}>} arr - An array of objects, each containing a `value` property of type number.
+ * @return {number} The total sum of all `value` properties in the array. Returns 0 if the array is null or undefined.
+ */
+const sumValues = (arr: { value: number }[]) => {
+  if (!arr) {
+    return 0
+  }
+  return arr.reduce((total, obj) => total + obj.value, 0)
+}
 // verify endpoint
 app.get("/verify", authenticateToken, async (req, res) => {
   try {
-    const query = `SELECT id, email, username from exp_users WHERE id = $1`
-
     // @ts-expect-error: We assume `req.user` exists after authentication
     const userId = req.user.userId
 
-    const result = await client.query(query, [userId])
-    const resultVal = await client.query(
-      "SELECT SUM(value) AS total_value FROM user_data WHERE user_id = $1",
-      [userId]
-    )
+    // Fetch user details from the `exp_users` table
+    const { data: userData, error: userError } = await supabase
+      .from("exp_users")
+      .select("id, email, username")
+      .eq("id", userId)
+      .single()
 
-    const user = { ...result.rows[0], total_value: resultVal.rows[0].total_value }
+    if (userError) {
+      console.error(userError)
+      return res.status(500).json({ error: "Error fetching user details" })
+    }
+
+    // Fetch the total value from the `user_data` table
+    const { data: totalValueData, error: totalValueError } = await supabase
+      .from("user_data")
+      .select("value")
+      .eq("user_id", userId)
+
+    if (totalValueError) {
+      console.error(totalValueError)
+      return res.status(500).json({ error: "Error fetching total value" })
+    }
+
+    // Combine user details and total value into a single object
+    const user = {
+      ...userData,
+      total_value: sumValues(totalValueData) || 0
+    }
+
     res.status(200).json({ message: "Token is valid", user, login: true })
+    return
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: "Internal server error" })
+    return
   }
 })
+
 app.get("/", authenticateToken, async (req: Request, res: Response) => {
   try {
     // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
@@ -92,30 +114,40 @@ app.get("/", authenticateToken, async (req: Request, res: Response) => {
 
 app.get("/api", authenticateToken, async (req: Request, res: Response) => {
   try {
-    const query = `
-  SELECT 
-    ud.id AS item_id,
-    u.id AS user_id,
-    u.username, 
-    ud.date, 
-    TO_CHAR(ud.value, 'FM999999999.00') AS value,
-    ud.description
-  FROM 
-    exp_users u
-  JOIN 
-    user_data ud 
-  ON 
-    u.id = ud.user_id
-  WHERE 
-    u.id = $1
-`
     // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
-    const result = await client.query(query, [req.user.userId])
+    const userId = req.user.userId
 
-    res.json(result.rows)
+    // Fetch data from `user_data` and `exp_users` tables using a join
+    const { data, error } = await supabase
+      .from("user_data")
+      .select(
+        `
+        item_id:id,
+        user_id,
+        exp_users(username),
+        date,
+        value,
+        description
+        `
+      )
+      .eq("user_id", userId)
+
+    if (error) {
+      console.error("Error fetching data:", error)
+      return res.status(500).json({ error: "Internal server error" })
+    }
+
+    // Format the value field (e.g., for two decimal places)
+    const formattedData = data.map((row) => ({
+      ...row,
+
+      value: parseFloat(row.value).toFixed(2)
+    }))
+
+    res.json(formattedData)
     return
   } catch (err) {
-    console.error("Error executing query", err.stack)
+    console.error("Error executing query", err)
     res.status(500).json({ error: "Internal server error" })
     return
   }
@@ -130,6 +162,7 @@ const validateData = [
 
 app.post("/api", validateData, authenticateToken, async (req: Request, res: Response) => {
   try {
+    // Validate request data
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -141,19 +174,26 @@ app.post("/api", validateData, authenticateToken, async (req: Request, res: Resp
     // @ts-expect-error: TypeScript doesn't recognize `user` on `req`, but we know it's safe.
     const userId = req.user.userId
 
-    // Insert the new data
-    const query = `
-      INSERT INTO user_data (user_id, date, value, description)
-      VALUES ($1, $2, $3, $4)
-    `
+    // Insert the new data into the `user_data` table
+    const { data, error } = await supabase.from("user_data").insert([
+      {
+        user_id: userId,
+        date,
+        value,
+        description
+      }
+    ])
 
-    const result = await client.query(query, [userId, date, value, description])
+    if (error) {
+      console.error("Error inserting data:", error)
+      return res.status(500).json({ error: "Internal server error" })
+    }
 
-    res.status(201).json({ message: "Data added successfully", data: result.rows })
+    res.status(201).json({ message: "Data added successfully", data })
 
     return
   } catch (err) {
-    console.error("Error executing query", err.stack)
+    console.error("Error executing request", err)
     res.status(500).json({ error: "Internal server error" })
 
     return
@@ -164,16 +204,23 @@ app.delete("/api/:id", authenticateToken, async (req: Request, res: Response) =>
   try {
     const { id } = req.params
 
-    const query = `DELETE FROM user_data WHERE id = $1`
-    const result = await client.query(query, [id])
-    if (result.rowCount === 0) {
+    // Delete the data using Supabase
+    const { data, error, count } = await supabase.from("user_data").delete().eq("id", id)
+
+    if (error) {
+      console.error("Error deleting data:", error)
+      return res.status(500).json({ error: "Failed to delete data" })
+    }
+
+    if (count === 0) {
       return res.status(404).json({ error: "No data found to delete" })
     }
-    res.status(200).json({ message: "Data deleted successfully" })
+
+    res.status(200).json({ message: "Data deleted successfully", data })
 
     return
   } catch (err) {
-    console.error("Error executing query", err.stack)
+    console.error("Error executing query", err)
     res.status(500).json({ error: "Internal server error" })
 
     return
@@ -188,7 +235,6 @@ const validateDataAuth = [
   body("email").notEmpty().withMessage("Date must be in ISO 8601 format"),
   body("password").notEmpty().withMessage("Value must be a number")
 ]
-
 app.post("/register", validateDataAuth, async (req: Request, res: Response) => {
   const { username, email, password } = req?.body || {}
 
@@ -198,19 +244,33 @@ app.post("/register", validateDataAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ errors: errors.array() })
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const result = await client.query(
-      "INSERT INTO exp_users (username, email, password) VALUES ($1, $2, $3) RETURNING id, email, username",
-      [username, email, hashedPassword]
-    )
+    // Insert the new user into the 'exp_users' table using Supabase
+    const { data, error } = await supabase
+      .from("exp_users")
+      .insert([{ username, email, password: hashedPassword }])
+      .select("id, email, username")
+      .single() // To return a single inserted row
+
+    if (error) {
+      console.error("Error registering user:", error)
+      return res.status(500).json({ error: "Registration failed", msg: error.message })
+    }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: result.rows[0].id }, JWT_SECRET, { expiresIn: "1h" })
-    res.status(201).json({ message: "User registered successfully", data: result.rows[0], token })
+    const token = jwt.sign({ userId: data.id }, JWT_SECRET, { expiresIn: "1h" })
+
+    res.status(201).json({
+      message: "User registered successfully",
+      data: data,
+      token
+    })
     return
   } catch (error) {
-    res.status(500).json({ error: "Registration failed", msg: error })
+    console.error("Registration error:", error)
+    res.status(500).json({ error: "Registration failed", msg: error.message })
     return
   }
 })
@@ -221,12 +281,17 @@ app.post("/login", async (req: Request, res: Response) => {
 
   try {
     // Find user in database
-    const result = await client.query("SELECT * FROM exp_users WHERE username = $1", [username])
-    const user = result.rows[0]
+    const { data: users, error } = await supabase
+      .from("exp_users")
+      .select("*")
+      .eq("username", username)
+      .single()
 
-    if (!user) {
+    if (error || !users) {
       return res.status(401).json({ error: "Invalid credentials" })
     }
+
+    const user = users
 
     // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password)
@@ -241,6 +306,7 @@ app.post("/login", async (req: Request, res: Response) => {
     res.json({ token })
     return
   } catch (error) {
+    console.error("Login error:", error)
     res.status(500).json({ error: "Login failed", msg: error })
     return
   }

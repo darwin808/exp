@@ -1,6 +1,7 @@
 {
   "name": "exp",
   "private": true,
+  "version": "0.1.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "turbo build",
@@ -34,7 +35,7 @@
   },
   "packageManager": "pnpm@9.3.0",
   "engines": {
-    "node": ">=20"
+    "node": "23"
   },
   "prettier": {
     "endOfLine": "lf",
