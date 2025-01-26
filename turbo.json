@@ -7,7 +7,16 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist"],
-      "env": ["VITE_API_URL", "DB_PORT", "SERVER_PORT", "DB_DATABASE", "DB_USER", "DB_PASSWORD"]
+      "env": [
+        "VITE_API_URL",
+        "DB_PORT",
+        "SERVER_PORT",
+        "DB_DATABASE",
+        "DB_USER",
+        "DB_PASSWORD",
+        "SUPABASE_PROJECT_ID",
+        "SUPABASE_API_KEY"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
