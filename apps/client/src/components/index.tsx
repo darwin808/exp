@@ -144,7 +144,7 @@ type headerCompProps = {
   currentMonth: number
   setCurrentYear: (e: number) => void
   setCurrentMonth: (e: number) => void
-  totalValue?: string
+  totalValue?: number
 }
 
 export const HeaderComp = ({
@@ -153,7 +153,7 @@ export const HeaderComp = ({
   currentDay,
   setCurrentMonth,
   setCurrentYear,
-  totalValue = "0"
+  totalValue = 0
 }: headerCompProps) => {
   const [showMoney, setShowMoney] = useState(false)
 

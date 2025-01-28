@@ -36,7 +36,7 @@ type User = {
   id: number
   email: string
   username: string
-  total_value: string // If it's a string, keep it as a string
+  total_value: number // If it's a string, keep it as a string
 }
 
 export type VerifyResponse = {
